@@ -21,3 +21,9 @@ class GoMining:
         url = f"{GOMINING_BASE}/mining/mode/enable"
         r = requests.post(url, headers=self.headers())
         return r.json()
+    
+    def get_dashboard(self):
+        url = f"{GOMINING_BASE}/user/dashboard"
+        r = requests.get(url, headers=self.headers())
+        return r.json()
+
