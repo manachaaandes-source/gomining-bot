@@ -1,33 +1,34 @@
-import time
-from gomining import GoMiningClient
-from telegram_bot import send_message
+import os
+from fastapi import FastAPI, Request
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler
 
-gm = GoMiningClient()
+from config import BOT_TOKEN
+from telegram_commands import cmd_start, cmd_status, cmd_reward, cmd_on
 
-def main_loop():
-    while True:
-        try:
-            reward = gm.get_daily_reward()
+app = FastAPI()
 
-            btc = reward.get("amount_btc", 0)
-            usd = reward.get("amount_usd", 0)
+BOT_URL = os.getenv("BOT_WEBHOOK_URL")
 
-            msg = (
-                f"🟣 GoMining 今日の報酬\n"
-                f"BTC: {btc}\n"
-                f"USD: ${usd}\n\n"
-                f"⛏ マイニングを自動でONにします..."
-            )
-            send_message(msg)
+application = (
+    ApplicationBuilder()
+    .token(BOT_TOKEN)
+    .build()
+)
 
-            gm.enable_mining_mode()
-            send_message("✅ マイニング 再稼働完了！")
+application.add_handler(CommandHandler("start", cmd_start))
+application.add_handler(CommandHandler("status", cmd_status))
+application.add_handler(CommandHandler("reward", cmd_reward))
+application.add_handler(CommandHandler("on", cmd_on))
 
-        except Exception as e:
-            send_message(f"⚠ エラー発生: {e}")
+@app.post("/")
+async def telegram_webhook(request: Request):
+    json_data = await request.json()
+    update = Update.de_json(json_data, application.bot)
+    await application.process_update(update)
+    return "ok"
 
-        time.sleep(24 * 60 * 60)  # 24時間
-        # テストしたいときは 60秒に変更
+@app.on_event("startup")
+async def on_startup():
+    await application.bot.set_webhook(url=BOT_URL)
 
-if __name__ == "__main__":
-    main_loop()

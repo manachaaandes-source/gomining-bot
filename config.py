@@ -1,9 +1,9 @@
 import os
 
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
 GOMINING_ACCESS_TOKEN = os.getenv("GOMINING_ACCESS_TOKEN")
 GOMINING_REFRESH_TOKEN = os.getenv("GOMINING_REFRESH_TOKEN")
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# API エンドポイント
 GOMINING_BASE = "https://api.gomining.com/v1"
